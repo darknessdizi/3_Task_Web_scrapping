@@ -24,17 +24,28 @@ attrs2 = {"data-qa": "vacancy-serp__vacancy vacancy-serp__vacancy_standard_plus"
 attrs3 = {"data-qa": "vacancy-serp__vacancy vacancy-serp__vacancy_standard"}
 
 a = time.perf_counter()
-
+count = 0
+count_py = 1
+end_page = True
 my_json = []
 
-for p in range(5):
+while end_page:
     while True:
-        html = requests.get(url, headers=get_headers(), params=get_parametres(p))
+        html = requests.get(url, headers=get_headers(), params=get_parametres(count))
         soup = BeautifulSoup(html.text, features="lxml")
         div = soup.find('div', id="a11y-main-content")
         if div:
             serp_items = div.find_all('div', class_="serp-item", attrs=[attrs1, attrs2, attrs3])
             break
+    end_page = soup.find('a', class_="bloko-button", rel="nofollow", attrs={"data-qa": "pager-next"})
+    if not end_page:
+        print('Последний лист')
+        print('Страница: ', count)
+        end_page = False
+    else:
+        print('Будет еще страница')
+        print('Страница: ', count)
+        
     for i in serp_items:
         my_dict = {
             'link': None,
@@ -62,10 +73,15 @@ for p in range(5):
                     my_dict['fields']['tittle'] = i.find('a').text
                     my_json.append(my_dict)
                 break 
+        print('Объявление: ', count_py)
+        print(my_dict['link'])
         print('*' * 40)
+        count_py += 1
+    print('-' * 80)
+    count += 1
 
-        with open('web_parser.json', 'w', encoding='UTF-8') as f:
-            json.dump(my_json, f, ensure_ascii=False, indent=2)
+with open('web_parser.json', 'w', encoding='UTF-8') as f:
+    json.dump(my_json, f, ensure_ascii=False, indent=2)
             
 b = time.perf_counter()
 print('Время работы:', b - a)
