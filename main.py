@@ -54,18 +54,17 @@ def save_json():
         json.dump(my_json, f, ensure_ascii=False, indent=2)   
 
 
-url = 'https://spb.hh.ru/search/vacancy'
-
-attrs1 = {"data-qa": "vacancy-serp__vacancy vacancy-serp__vacancy_premium"}
-attrs2 = {"data-qa": "vacancy-serp__vacancy vacancy-serp__vacancy_standard_plus"}
-attrs3 = {"data-qa": "vacancy-serp__vacancy vacancy-serp__vacancy_standard"}
-
-count = 0
-count_py = 1
-end_page = True
-my_json = []
-
 if __name__ == '__main__':
+    url = 'https://spb.hh.ru/search/vacancy'
+
+    attrs1 = {"data-qa": "vacancy-serp__vacancy vacancy-serp__vacancy_premium"}
+    attrs2 = {"data-qa": "vacancy-serp__vacancy vacancy-serp__vacancy_standard_plus"}
+    attrs3 = {"data-qa": "vacancy-serp__vacancy vacancy-serp__vacancy_standard"}
+
+    count = 0
+    count_py = 1
+    end_page = True
+    my_json = []
     a = time.perf_counter()
     while end_page:
         div, soup, serp_items = get_requests(url, get_parametres(count), id="a11y-main-content")
