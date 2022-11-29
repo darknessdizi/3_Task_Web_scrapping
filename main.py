@@ -8,7 +8,6 @@ from alive_progress import alive_bar
 from variables import *
 
 
-
 def get_headers():
 
     '''Заголовки для get запросов'''
@@ -48,8 +47,7 @@ def get_requests(url, params=None, class_=None, **kwargs):
                                                     ]}).text
                 pattern1 = re.search(r'[Dd]jango', description)
                 pattern2 = re.search(r'[Ff]lask', description)
-                pattern3 = re.search(r'[Aa][Pp][Ii]', description)
-                if pattern1 or pattern2 or pattern3:
+                if pattern1 or pattern2: 
                     append_list(div)
                 return
 
@@ -57,13 +55,12 @@ def append_list(div):
 
     '''Добавляет данные в словарь и в общий список словарей'''
 
-    my_dict['fields']['company'] = i.find('a', 
-        attrs={"data-qa": "vacancy-serp__vacancy-employer"}).text
-    my_dict['fields']['city'] = i.find('div', class_="bloko-text", 
-        attrs={"data-qa": "vacancy-serp__vacancy-address"}).text
-    my_dict['fields']['salary'] = div.find('div', 
-        attrs={"data-qa": "vacancy-salary"}).text
-    my_dict['fields']['tittle'] = i.find('a').text
+    dict_fields = {}
+    dict_fields['company'] = item.find(attrs={"data-qa": "vacancy-serp__vacancy-employer"}).text
+    dict_fields['city'] = item.find(attrs={"data-qa": "vacancy-serp__vacancy-address"}).text
+    dict_fields['salary'] = div.find(attrs={"data-qa": "vacancy-salary"}).text
+    dict_fields['tittle'] = item.find('a').text
+    my_dict['fields'] = dict_fields
     my_json.append(my_dict)
     save_json()
 
@@ -79,33 +76,25 @@ if __name__ == '__main__':
     
     a = time.perf_counter()
     while end_page:
-        div, soup, serp_items = get_requests(url, get_parametres(count), id="a11y-main-content")
-        end_page = soup.find('a', class_="bloko-button", rel="nofollow", attrs={"data-qa": "pager-next"})
-        if not end_page:
-            print('Последний лист')
-            print('Страница: ', count + 1)
-            end_page = False
+        div, soup, serp_items = get_requests(url, get_parametres(count_page), id="a11y-main-content")
+        end_page = soup.find(attrs={"data-qa": "pager-next"})
+        if end_page:
+            print('Страница: ', count_page + 1)
         else:
-            print('Страница: ', count + 1)
+            print('Последний лист')
+            print('Страница: ', count_page + 1)
+            end_page = False
             
         with alive_bar(len(serp_items), force_tty=True, dual_line=True) as bar:
-            for i in serp_items:
-                my_dict = {
-                    'link': None,
-                    'fields': {
-                        'tittle': None,
-                        'salary': None,
-                        'company': None,
-                        'city': None
-                        }
-                    }
-                my_dict['link'] = i.find('a').get('href')
-                bar.text = f'Download {i.find("a").text}, please wait ...'
+            for item in serp_items:
+                my_dict = {}
+                my_dict['link'] = item.find('a').get('href')
+                bar.text = f'Download {item.find("a").text}, please wait ...'
                 get_requests(my_dict['link'], class_="vacancy-title")
                 bar()
                 
         print('-' * 80)
-        count += 1
+        count_page += 1
                 
     b = time.perf_counter()
     print('Время работы:', b - a)
