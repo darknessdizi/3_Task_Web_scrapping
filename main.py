@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import re
 import time
 import json
+from alive_progress import alive_bar
 
 
 def get_headers():
@@ -77,23 +78,28 @@ if __name__ == '__main__':
             print('Будет еще страница')
             print('Страница: ', count + 1)
             
-        for i in serp_items:
-            my_dict = {
-                'link': None,
-                'fields': {
-                    'tittle': None,
-                    'salary': None,
-                    'company': None,
-                    'city': None
+        with alive_bar(len(serp_items), force_tty=True, dual_line=True) as bar:
+            for i in serp_items:
+                my_dict = {
+                    'link': None,
+                    'fields': {
+                        'tittle': None,
+                        'salary': None,
+                        'company': None,
+                        'city': None
+                        }
                     }
-                }
-            my_dict['link'] = i.find('a').get('href')
-            get_requests(my_dict['link'], class_="vacancy-title")
-            
-            print('Объявление: ', count_py)
-            print(my_dict['link'])
-            print('*' * 40)
-            count_py += 1
+                my_dict['link'] = i.find('a').get('href')
+                bar.text = f'Download {i.find("a").text}, please wait ...'
+                get_requests(my_dict['link'], class_="vacancy-title")
+                
+                bar()
+                
+                print('Объявление: ', count_py)
+                print(my_dict['link'])
+                print('*' * 40)
+                count_py += 1
+                
         print('-' * 80)
         count += 1
 
