@@ -5,6 +5,8 @@ import re
 import time
 import json
 from alive_progress import alive_bar
+from variables import *
+
 
 
 def get_headers():
@@ -20,12 +22,16 @@ def get_parametres(num):
     return {
         'text': 'python',
         'area': [1, 2],
-        # 'area': 1146,
         'page': num,
         'hhtmFrom': 'vacancy_search_list'
     }
 
 def get_requests(url, params=None, class_=None, **kwargs):
+
+    '''Осуществяет get запросы, поиск тегов по html объекту и
+    
+    поиск заданных параметров в описании'''
+
     while True:
         html = requests.get(url, headers=get_headers(), params=params)
         soup = BeautifulSoup(html.text, features="lxml")
@@ -43,12 +49,14 @@ def get_requests(url, params=None, class_=None, **kwargs):
                 pattern1 = re.search(r'[Dd]jango', description)
                 pattern2 = re.search(r'[Ff]lask', description)
                 pattern3 = re.search(r'[Aa][Pp][Ii]', description)
-                # print(pattern3)#, pattern2)
                 if pattern1 or pattern2 or pattern3:
                     append_list(div)
                 return
 
 def append_list(div):
+
+    '''Добавляет данные в словарь и в общий список словарей'''
+
     my_dict['fields']['company'] = i.find('a', 
         attrs={"data-qa": "vacancy-serp__vacancy-employer"}).text
     my_dict['fields']['city'] = i.find('div', class_="bloko-text", 
@@ -60,20 +68,15 @@ def append_list(div):
     save_json()
 
 def save_json():
+
+    '''Сохраняет список словарей в json файл'''
+
     with open('web_parser.json', 'w', encoding='UTF-8') as f:
         json.dump(my_json, f, ensure_ascii=False, indent=2)   
 
 
 if __name__ == '__main__':
-    url = 'https://spb.hh.ru/search/vacancy'
-
-    attrs1 = {"data-qa": "vacancy-serp__vacancy vacancy-serp__vacancy_premium"}
-    attrs2 = {"data-qa": "vacancy-serp__vacancy vacancy-serp__vacancy_standard_plus"}
-    attrs3 = {"data-qa": "vacancy-serp__vacancy vacancy-serp__vacancy_standard"}
-
-    count = 0
-    end_page = True
-    my_json = []
+    
     a = time.perf_counter()
     while end_page:
         div, soup, serp_items = get_requests(url, get_parametres(count), id="a11y-main-content")
