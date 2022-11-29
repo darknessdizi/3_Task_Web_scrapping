@@ -8,13 +8,19 @@ from alive_progress import alive_bar
 
 
 def get_headers():
+
+    '''Заголовки для get запросов'''
+
     return Headers(browser='chrome', os='win').generate()
 
 def get_parametres(num):
+
+    '''Параметры для get запросов'''
+
     return {
         'text': 'python',
-        # 'area': [1, 2],
-        'area': 1146,
+        'area': [1, 2],
+        # 'area': 1146,
         'page': num,
         'hhtmFrom': 'vacancy_search_list'
     }
@@ -36,8 +42,9 @@ def get_requests(url, params=None, class_=None, **kwargs):
                                                     ]}).text
                 pattern1 = re.search(r'[Dd]jango', description)
                 pattern2 = re.search(r'[Ff]lask', description)
-                # print(pattern1, pattern2)
-                if pattern1 or pattern2:
+                pattern3 = re.search(r'[Aa][Pp][Ii]', description)
+                # print(pattern3)#, pattern2)
+                if pattern1 or pattern2 or pattern3:
                     append_list(div)
                 return
 
@@ -50,6 +57,7 @@ def append_list(div):
         attrs={"data-qa": "vacancy-salary"}).text
     my_dict['fields']['tittle'] = i.find('a').text
     my_json.append(my_dict)
+    save_json()
 
 def save_json():
     with open('web_parser.json', 'w', encoding='UTF-8') as f:
@@ -95,8 +103,6 @@ if __name__ == '__main__':
                 
         print('-' * 80)
         count += 1
-
-    save_json()
                 
     b = time.perf_counter()
     print('Время работы:', b - a)

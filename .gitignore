@@ -2,3 +2,5 @@ documents/
 env/
 test/
 web_parser.json
+my_html_vakansii.html
+constants.py
