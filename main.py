@@ -13,7 +13,8 @@ def get_headers():
 def get_parametres(num):
     return {
         'text': 'python',
-        'area': [1, 2],
+        # 'area': [1, 2],
+        'area': 1146,
         'page': num,
         'hhtmFrom': 'vacancy_search_list'
     }
@@ -35,7 +36,7 @@ def get_requests(url, params=None, class_=None, **kwargs):
                                                     ]}).text
                 pattern1 = re.search(r'[Dd]jango', description)
                 pattern2 = re.search(r'[Ff]lask', description)
-                print(pattern1, pattern2)
+                # print(pattern1, pattern2)
                 if pattern1 or pattern2:
                     append_list(div)
                 return
@@ -63,7 +64,6 @@ if __name__ == '__main__':
     attrs3 = {"data-qa": "vacancy-serp__vacancy vacancy-serp__vacancy_standard"}
 
     count = 0
-    count_py = 1
     end_page = True
     my_json = []
     a = time.perf_counter()
@@ -75,7 +75,6 @@ if __name__ == '__main__':
             print('Страница: ', count + 1)
             end_page = False
         else:
-            print('Будет еще страница')
             print('Страница: ', count + 1)
             
         with alive_bar(len(serp_items), force_tty=True, dual_line=True) as bar:
@@ -92,13 +91,7 @@ if __name__ == '__main__':
                 my_dict['link'] = i.find('a').get('href')
                 bar.text = f'Download {i.find("a").text}, please wait ...'
                 get_requests(my_dict['link'], class_="vacancy-title")
-                
                 bar()
-                
-                print('Объявление: ', count_py)
-                print(my_dict['link'])
-                print('*' * 40)
-                count_py += 1
                 
         print('-' * 80)
         count += 1
