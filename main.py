@@ -5,7 +5,6 @@ import re
 import time
 import json
 from alive_progress import alive_bar
-from variables import *
 
 
 def get_headers():
@@ -88,11 +87,12 @@ def main():
 
     '''Проверяет наличие страниц и запускает основные функции'''
 
+    url = 'https://spb.hh.ru/search/vacancy'
     end_page = True
     count_page = 0
     while end_page:
         div, soup = get_requests(url, get_parametres(count_page), id="a11y-main-content")
-        serp_items = div.find_all(class_="serp-item", attrs=[attrs1, attrs2, attrs3])
+        serp_items = div.find_all(class_="serp-item")
         end_page = soup.find(attrs={"data-qa": "pager-next"})
         if end_page:
             print('Страница: ', count_page + 1)
@@ -109,6 +109,7 @@ def main():
 
 if __name__ == '__main__':
     
+    my_json = []
     a = time.perf_counter()
     main()       
     b = time.perf_counter()
