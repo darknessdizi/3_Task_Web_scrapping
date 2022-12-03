@@ -22,7 +22,8 @@ def get_parametres(num):
         'text': 'python',
         'area': [1, 2],
         'page': num,
-        'hhtmFrom': 'vacancy_search_list'
+        'hhtmFrom': 'vacancy_search_list',
+        'items_on_page':'20'
     }
 
 
